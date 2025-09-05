@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { Wand2, Check, X, Shrink, StretchHorizontal, Table2 } from "lucide-react";
 import { PreviewModal } from "../components/PreviewModal";
+import { getServerUrl } from "../lib/server";
 
 type Props = {
   rect: DOMRect;
@@ -12,7 +13,8 @@ type Props = {
 };
 
 async function fetchEdit(prompt: string, input: string): Promise<string> {
-  const res = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + "/api/edit", {
+  const baseUrl = getServerUrl();
+  const res = await fetch(baseUrl + "/api/edit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt, input }),

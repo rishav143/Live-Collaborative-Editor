@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { getServerUrl } from "../lib/server";
 import { Send, Wand2, Globe } from "lucide-react";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -31,7 +32,8 @@ export const ChatSidebar: React.FC<{ onInsertToEditor: (text: string) => void }>
         endpoint = "/api/agent/search";
         body = { query: userMsg.content };
       }
-      const res = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + endpoint, {
+      const baseUrl = getServerUrl();
+      const res = await fetch(baseUrl + endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -61,7 +63,7 @@ export const ChatSidebar: React.FC<{ onInsertToEditor: (text: string) => void }>
           <input
             className="flex-1 border rounded px-3 py-2 text-sm bg-transparent"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e: { target: { value: any; }; }) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
