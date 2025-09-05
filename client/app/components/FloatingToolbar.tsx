@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { Wand2, Check, X, Shrink, StretchHorizontal, Table2 } from "lucide-react";
 import { PreviewModal } from "../components/PreviewModal";
-import { getServerUrl } from "../lib/server";
+import { postJson } from "../lib/server";
 
 type Props = {
   rect: DOMRect;
@@ -13,15 +13,8 @@ type Props = {
 };
 
 async function fetchEdit(prompt: string, input: string): Promise<string> {
-  const baseUrl = getServerUrl();
-  const res = await fetch(baseUrl + "/api/edit", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, input }),
-  });
-  if (!res.ok) throw new Error("Failed to fetch edit");
-  const data = await res.json();
-  return data.output as string;
+  const data = await postJson<{ output: string }>("/api/edit", { prompt, input }, { timeoutMs: 12000 });
+  return data.output;
 }
 
 function toTable(text: string): string {
@@ -64,6 +57,7 @@ export const FloatingToolbar: React.FC<Props> = ({ rect, selectedText, onClose, 
       setPreview({ original: selectedText, suggestion });
     } catch (e) {
       console.error(e);
+      alert("AI request failed: " + (e as any)?.message);
     } finally {
       setLoading(null);
     }

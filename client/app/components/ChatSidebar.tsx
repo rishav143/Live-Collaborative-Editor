@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { getServerUrl } from "../lib/server";
+import { postJson } from "../lib/server";
 import { Send, Wand2, Globe } from "lucide-react";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -32,13 +32,7 @@ export const ChatSidebar: React.FC<{ onInsertToEditor: (text: string) => void }>
         endpoint = "/api/agent/search";
         body = { query: userMsg.content };
       }
-      const baseUrl = getServerUrl();
-      const res = await fetch(baseUrl + endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
+      const data = await postJson<any>(endpoint, body, { timeoutMs: 12000 });
       const text = data.output ?? data.answer ?? JSON.stringify(data);
       setMessages((m) => [...m, { role: "assistant", content: text }]);
     } catch (e: any) {
